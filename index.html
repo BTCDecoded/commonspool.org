@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" data-api-base="">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Commons Pool</title>
+  <meta name="description" content="Commons Pool is a non-custodial Bitcoin mining pool with no operator. Built on Bitcoin Commons.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/main.css?v=4">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="wordmark" href="index.html" aria-current="page">Commons Pool</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="architecture.html">Architecture</a>
+        <a href="status.html">Status</a>
+        <a href="faq.html">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <section class="hero">
+        <h1 class="display">Commons Pool</h1>
+        <p class="hero__claim">A Bitcoin mining pool with no operator.</p>
+        <p class="hero__lede">Non-custodial. KYC-free. Built on Bitcoin Commons. Funds go from the block to your address. Nothing in between.</p>
+      </section>
+
+      <section class="tape" data-status-panel aria-label="Pool status">
+        <div>
+          <div class="tape__meta">
+            <span class="pip pip--stub" aria-hidden="true"></span>
+            <span class="tape__phase" data-field="phase-label">signet testnet</span>
+            <span data-field="updated">test data · not yet live</span>
+          </div>
+          <p class="eyebrow">Last finalized snapshot</p>
+          <p class="tape__id" data-field="snapshot_id">7c3e9a1f…e4a072</p>
+          <a class="tape__more" href="status.html">Open status</a>
+        </div>
+        <div>
+          <dl class="tape__facts">
+            <div>
+              <dt>pending shares</dt>
+              <dd data-field="pending_shares">142</dd>
+            </div>
+            <div>
+              <dt>peers finalized</dt>
+              <dd data-field="peers_finalized">8</dd>
+            </div>
+            <div>
+              <dt>fee</dt>
+              <dd data-field="fee">1%</dd>
+            </div>
+            <div>
+              <dt>payout</dt>
+              <dd data-field="payout">coinbase / PPLNS</dd>
+            </div>
+          </dl>
+        </div>
+        <noscript>
+          <p class="status-note">JavaScript required for live data.</p>
+        </noscript>
+      </section>
+
+      <div class="split-prose">
+        <section class="section" aria-labelledby="problem">
+          <h2 id="problem">The problem</h2>
+          <p>Every mining pool today has an operator. That operator holds your earnings, decides which transactions go in a block, and can be pressured or shut down.</p>
+          <p>A pool without an operator is not a new idea. P2Pool tried it. Commons Pool is a different attempt at the same goal: no custodian, no coordinator, and no parallel chain.</p>
+        </section>
+        <section class="section" aria-labelledby="how">
+          <h2 id="how">How it works</h2>
+          <p>Miners keep template selection. The pool does not pick transactions for you.</p>
+          <p>When the pool finds a block, the coinbase already pays miner addresses from a shared snapshot of work. No pool wallet. No withdrawal.</p>
+          <p>Peers agree on that snapshot at checkpoints instead of running a second blockchain. Between checkpoints, every coinbase is built from the last finalized set.</p>
+        </section>
+        <section class="section" aria-labelledby="commons">
+          <h2 id="commons">Built on Bitcoin Commons</h2>
+          <p>Commons Pool runs on <a href="https://thebitcoincommons.org" target="_blank" rel="noopener">Bitcoin Commons</a>, not Bitcoin Core. Consensus is specified in the Orange Paper, so the node layer is not a single implementation.</p>
+        </section>
+        <section class="section" aria-labelledby="connect">
+          <h2 id="connect">Connect</h2>
+          <p>Signet. Username is your Bitcoin address. Not live on mainnet.</p>
+          <pre><code>stratum+tcp://signet.commonspool.org:3334
+username: your address
+password: x</code></pre>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <nav class="footer-links" aria-label="Footer">
+        <a href="architecture.html">Architecture</a>
+        <a href="status.html">Status</a>
+        <a href="faq.html">FAQ</a>
+        <a href="https://thebitcoincommons.org" target="_blank" rel="noopener">Bitcoin Commons</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/status.js" defer></script>
+</body>
+</html>

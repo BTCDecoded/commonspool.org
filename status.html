@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-api-base="">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Status — Commons Pool</title>
+  <meta name="description" content="Commons Pool status. Snapshot, work, and finds. Signet testnet.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="wordmark" href="index.html">Commons Pool</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="architecture.html">Architecture</a>
+        <a href="status.html" aria-current="page">Status</a>
+        <a href="faq.html">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap" data-status-panel data-refresh="true">
+      <div class="dash-head">
+        <div>
+          <p class="eyebrow">
+            <span class="pip pip--stub indicator indicator--stub" aria-hidden="true"></span>
+            <span data-field="phase-label">signet testnet</span>
+            ·
+            <span data-field="updated">test data · not yet live</span>
+          </p>
+          <h1 class="page-title">Status</h1>
+        </div>
+        <p class="dash-head__line">
+          <span data-field="quorum_status">assembled</span>
+          ·
+          <span data-field="peers_finalized">8</span> peers finalized
+          ·
+          <span data-field="pending_shares">142</span> shares pending
+        </p>
+      </div>
+
+      <section class="snap" aria-label="Snapshot">
+        <p class="eyebrow">Last finalized snapshot</p>
+        <p class="snap__id" data-field="snapshot_id">7c3e9a1f…e4a072</p>
+        <ul class="snap__facts">
+          <li><span class="k">network</span> <span data-field="network">signet</span></li>
+          <li><span class="k">derivation</span> <span data-field="derivation_version">1</span></li>
+          <li><span class="k">fee</span> <span data-field="fee">1%</span></li>
+          <li><span class="k">payout</span> <span data-field="payout">coinbase / PPLNS</span></li>
+          <li><span class="k">window</span> <span data-field="pending_shares">142</span> / <span data-field="share_window">10000</span></li>
+        </ul>
+        <div class="compose" data-compose="shares" role="img" aria-label="Share of work"></div>
+      </section>
+
+      <section class="chart-panel" aria-label="Hashrate">
+        <div class="split__h">
+          <h2>Hashrate</h2>
+          <div class="range-tabs" role="tablist" aria-label="Hashrate range">
+            <button type="button" data-range="24h" aria-pressed="true">24h</button>
+            <button type="button" data-range="7d" aria-pressed="false">7d</button>
+            <button type="button" data-range="30d" aria-pressed="false">30d</button>
+          </div>
+        </div>
+        <div class="chart">
+          <svg data-chart="hashrate" viewBox="0 0 800 200" preserveAspectRatio="none" role="img" aria-label="Pool hashrate"></svg>
+        </div>
+        <div class="chart-meta">
+          <span data-field="chart-low">—</span>
+          <span data-field="chart-high">—</span>
+        </div>
+      </section>
+
+      <div class="split">
+        <section aria-labelledby="work-label">
+          <div class="split__h">
+            <h2 id="work-label">Work</h2>
+            <input type="search" data-filter="contributors" aria-label="Filter miners" placeholder="Filter">
+          </div>
+          <div class="bars" data-list="share-bars"></div>
+        </section>
+
+        <section aria-labelledby="finds-label">
+          <div class="split__h">
+            <h2 id="finds-label">Finds</h2>
+          </div>
+          <ol class="finds" data-list="recent_blocks"></ol>
+        </section>
+      </div>
+
+      <section class="connect-card" aria-labelledby="connect">
+        <div>
+          <h2 id="connect">Connect</h2>
+          <p>Signet. Username is your Bitcoin address. Not live on mainnet.</p>
+        </div>
+        <pre><code>stratum+tcp://signet.commonspool.org:3334
+username: your address
+password: x</code></pre>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <nav class="footer-links" aria-label="Footer">
+        <a href="architecture.html">Architecture</a>
+        <a href="status.html" aria-current="page">Status</a>
+        <a href="faq.html">FAQ</a>
+        <a href="https://thebitcoincommons.org" target="_blank" rel="noopener">Bitcoin Commons</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/status.js" defer></script>
+</body>
+</html>

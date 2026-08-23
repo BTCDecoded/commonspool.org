@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture — Commons Pool</title>
+  <meta name="description" content="How Commons Pool works. Non-custodial payouts, miner-selected templates, checkpoint agreement.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="wordmark" href="index.html">Commons Pool</a>
+      <nav class="nav" aria-label="Primary">
+        <a href="architecture.html" aria-current="page">Architecture</a>
+        <a href="status.html">Status</a>
+        <a href="faq.html">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap">
+      <h1 class="page-title">Architecture</h1>
+      <p class="subtag">No operator. No pool wallet. No second chain. Miners get paid from the coinbase of blocks the pool finds.</p>
+
+      <section class="section" aria-labelledby="payouts">
+        <h2 id="payouts">Payouts</h2>
+        <p>Every miner builds templates whose coinbase already pays the current distribution. When a block is found, the money is already at miner addresses. Commons Pool never holds funds and never runs a withdrawal. The pool fee is 1%, taken in the coinbase.</p>
+        <p>The distribution is a pure function of a finalized share snapshot. Same snapshot, same outputs, on every peer.</p>
+      </section>
+
+      <section class="section" aria-labelledby="templates">
+        <h2 id="templates">Templates</h2>
+        <p>Miners connect with Stratum V2 and job declaration. You construct the block. The pool validates shares against the current snapshot. It does not select transactions for you.</p>
+      </section>
+
+      <section class="section" aria-labelledby="agreement">
+        <h2 id="agreement">Agreement</h2>
+        <p>The hard part is agreeing on the share tally before a block exists. Most designs put that on a parallel proof-of-work chain. Commons Pool does not.</p>
+        <p>Peers settle a snapshot at checkpoints. Between checkpoints, every coinbase is built from the last finalized snapshot. New shares accumulate for the next checkpoint. They do not change the current payout.</p>
+        <p>If a peer cannot finalize, it holds the previous snapshot and recovers by walking attested history. It does not guess.</p>
+      </section>
+
+      <section class="section" aria-labelledby="stack">
+        <h2 id="stack">Stack</h2>
+        <dl class="facts">
+          <div>
+            <dt>Node</dt>
+            <dd>Bitcoin Commons</dd>
+          </div>
+          <div>
+            <dt>Consensus</dt>
+            <dd>Orange Paper</dd>
+          </div>
+          <div>
+            <dt>Miner interface</dt>
+            <dd>Stratum V2</dd>
+          </div>
+          <div>
+            <dt>Transport</dt>
+            <dd>Iroh + QUIC</dd>
+          </div>
+          <div>
+            <dt>Reconciliation</dt>
+            <dd>Minisketch</dd>
+          </div>
+          <div>
+            <dt>Payouts</dt>
+            <dd>Deterministic derivation</dd>
+          </div>
+          <div>
+            <dt>Recovery</dt>
+            <dd>Threshold attestation</dd>
+          </div>
+          <div>
+            <dt>Network</dt>
+            <dd>Bitcoin signet, then mainnet</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="section" aria-labelledby="commons">
+        <h2 id="commons">Bitcoin Commons</h2>
+        <p>The pool node is <a href="https://thebitcoincommons.org" target="_blank" rel="noopener">Bitcoin Commons</a>, not Bitcoin Core. Rules come from the Orange Paper. That is a second implementation of Bitcoin, not a fork of the chain.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <nav class="footer-links" aria-label="Footer">
+        <a href="architecture.html" aria-current="page">Architecture</a>
+        <a href="status.html">Status</a>
+        <a href="faq.html">FAQ</a>
+        <a href="https://thebitcoincommons.org" target="_blank" rel="noopener">Bitcoin Commons</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

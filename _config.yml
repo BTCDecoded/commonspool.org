@@ -1,0 +1,5 @@
+# GitHub Pages: static files only. No theme, no plugins.
+theme: null
+plugins: []
+include:
+  - CNAME
