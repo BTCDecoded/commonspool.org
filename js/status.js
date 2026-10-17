@@ -253,6 +253,9 @@
     var range = (btn && btn.getAttribute("data-range")) || "24h";
     var series = (data.hashrate_series && data.hashrate_series[range]) || [];
     var ext = drawChart(svg, series);
+    var empty = root.querySelector("[data-chart-empty]");
+    if (empty) empty.hidden = !!ext;
+    svg.style.visibility = ext ? "" : "hidden";
     setText(root, "[data-field='chart-low']", ext ? ext.min.toFixed(1) + " TH/s" : "—");
     setText(root, "[data-field='chart-high']", ext ? ext.max.toFixed(1) + " TH/s" : "—");
   }
