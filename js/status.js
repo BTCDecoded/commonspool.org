@@ -83,15 +83,20 @@
     return value == null || value === "" ? "—" : String(value);
   }
 
-  function applyStatus(root, data) {
-    var fallback = localStub();
-    data = Object.assign({}, fallback, data || {});
-    if (!data.last_block) data.last_block = fallback.last_block;
-    if (!data.contributors || !data.contributors.length) data.contributors = fallback.contributors;
-    if (!data.recent_blocks || !data.recent_blocks.length) data.recent_blocks = fallback.recent_blocks;
-    if (!data.hashrate_series) data.hashrate_series = fallback.hashrate_series;
+  // Only a live pool's own numbers are shown. Before launch (or when the
+  // status API can't be reached) every stat stays blank: no sample data.
+  var NOT_LIVE_NOTE = "The pool is not live yet. Stats will appear here once it is.";
+  var UNREACHABLE_NOTE = "Pool status is unavailable right now. No stats to show.";
 
-    var live = data.phase === "live";
+  function applyStatus(root, data, unreachable) {
+    var live = !!data && data.phase === "live";
+    if (!live) {
+      data = {
+        network: (data && data.network) || "signet",
+        fee: data && data.fee,
+        payout: data && data.payout,
+      };
+    }
     root.classList.toggle("status-panel--live", live);
     root.classList.toggle("tape--live", live);
 
@@ -103,12 +108,18 @@
       indicators[i].classList.toggle("pip--live", live);
     }
 
+    var notes = root.querySelectorAll("[data-field='notice']");
+    for (var n = 0; n < notes.length; n++) {
+      notes[n].hidden = live;
+      notes[n].textContent = live ? "" : unreachable ? UNREACHABLE_NOTE : NOT_LIVE_NOTE;
+    }
+
     var last = data.last_block || {};
     setText(root, "[data-field='phase-label']", live ? "mainnet live" : "signet testnet");
     setText(
       root,
       "[data-field='updated']",
-      (live ? "updated " : "test data · ") + timeAgo(data.updated_at)
+      live ? "updated " + timeAgo(data.updated_at) : unreachable ? "status unavailable" : "not live yet"
     );
     setText(root, "[data-field='snapshot_id']", truncateHash(data.snapshot_id, 8, 6));
     setText(root, "[data-field='snapshot_id_full']", truncateHash(data.snapshot_id, 8, 6));
@@ -127,7 +138,7 @@
     setText(root, "[data-field='miners']", num(data.miners));
     setText(root, "[data-field='btc_mined']", num(data.btc_mined));
     setText(root, "[data-field='fee']", data.fee || "1%");
-    setText(root, "[data-field='payout']", data.payout || "—");
+    setText(root, "[data-field='payout']", data.payout || "coinbase / PPLNS");
     setText(root, "[data-field='share_window']", num(data.share_window));
     setText(root, "[data-field='network_difficulty']", data.network_difficulty || "—");
     setText(root, "[data-field='avg_time_to_block']", data.avg_time_to_block || "—");
@@ -138,7 +149,7 @@
     setText(
       root,
       "[data-field='stale_count']",
-      String((data.stale_peers && data.stale_peers.length) || 0)
+      live ? String((data.stale_peers && data.stale_peers.length) || 0) : "—"
     );
 
     fillList(root.querySelector("[data-list='stale_peers']"), data.stale_peers, 2, function (row) {
@@ -196,19 +207,12 @@
     applyMinerFilter(root);
   }
 
-  function hashSeries(hours, points, now) {
-    var out = [];
-    var i;
-    for (i = 0; i < points; i++) {
-      var t = now - ((points - 1 - i) * (hours * 3600000) / (points - 1));
-      var wave = 48.2 + Math.sin(i / 3.7) * 5.4 + ((i * 13) % 9) - 4;
-      out.push({ t: t, th: Math.round(Math.max(28, wave) * 10) / 10 });
-    }
-    return out;
-  }
-
   function drawChart(svg, series) {
-    if (!svg || !series || !series.length) return;
+    if (!svg) return;
+    if (!series || series.length < 2) {
+      svg.innerHTML = "";
+      return;
+    }
     var w = 800;
     var h = 200;
     var pad = 8;
@@ -244,15 +248,16 @@
   function drawActiveChart(root) {
     var svg = root.querySelector("[data-chart='hashrate']");
     if (!svg) return;
-    var data = root._poolData || localStub();
+    var data = root._poolData || {};
     var btn = root.querySelector('.range-tabs button[aria-pressed="true"]');
     var range = (btn && btn.getAttribute("data-range")) || "24h";
     var series = (data.hashrate_series && data.hashrate_series[range]) || [];
     var ext = drawChart(svg, series);
-    if (ext) {
-      setText(root, "[data-field='chart-low']", ext.min.toFixed(1) + " TH/s");
-      setText(root, "[data-field='chart-high']", ext.max.toFixed(1) + " TH/s");
-    }
+    var empty = root.querySelector("[data-chart-empty]");
+    if (empty) empty.hidden = !!ext;
+    svg.style.visibility = ext ? "" : "hidden";
+    setText(root, "[data-field='chart-low']", ext ? ext.min.toFixed(1) + " TH/s" : "—");
+    setText(root, "[data-field='chart-high']", ext ? ext.max.toFixed(1) + " TH/s" : "—");
   }
 
   function sharePct(row) {
@@ -348,124 +353,6 @@
     }
   }
 
-  function localStub() {
-    var now = Date.now();
-    return {
-      hashrate_series: {
-        "24h": hashSeries(24, 48, now),
-        "7d": hashSeries(24 * 7, 56, now),
-        "30d": hashSeries(24 * 30, 60, now),
-      },
-      luck: "112%",
-      rejected_pct: "1.8%",
-      orphans: 0,
-      phase: "stub",
-      network: "signet",
-      snapshot_id: "7c3e9a1f4b82d0e6a591c4f8b2d7e0136a8c5f91d4b0e27a9c1d6f83b5e4a072",
-      derivation_version: 1,
-      peers_finalized: 8,
-      quorum_status: "assembled",
-      last_attestation_at: new Date(now - 4 * 60 * 1000).toISOString(),
-      pending_shares: 142,
-      last_checkpoint_at: new Date(now - 11 * 60 * 1000).toISOString(),
-      hashrate: "48.2 TH/s",
-      hashrate_3h: "51.0 TH/s",
-      hashrate_24h: "44.7 TH/s",
-      blocks_found: 7,
-      miners: 12,
-      btc_mined: 87.5,
-      fee: "1%",
-      payout: "coinbase / PPLNS",
-      share_window: 10000,
-      network_difficulty: "1.21k",
-      avg_time_to_block: "3h 12m",
-      last_block: {
-        height: 1842,
-        hash: "000000086c4a91e2b7d04f1c8a55e390b2d1c7a04e9f6b83a1c2d4e5f6071829",
-        found_at: new Date(now - 2 * 60 * 60 * 1000).toISOString(),
-        finder: "miner-a1",
-        shares: 18420,
-      },
-      stale_peers: [
-        { peer_id: "peer-03", checkpoints_behind: 2 },
-        { peer_id: "peer-11", checkpoints_behind: 1 },
-      ],
-      contributors: [
-        { miner_id: "miner-a1", hashrate: "12.4 TH/s", share_pct: "25.7%", workers: 4, expected_blocks: 1.8, actual_blocks: 2 },
-        { miner_id: "miner-b7", hashrate: "9.1 TH/s", share_pct: "18.9%", workers: 3, expected_blocks: 1.3, actual_blocks: 1 },
-        { miner_id: "miner-c3", hashrate: "6.8 TH/s", share_pct: "14.1%", workers: 2, expected_blocks: 1.0, actual_blocks: 1 },
-        { miner_id: "miner-d2", hashrate: "5.4 TH/s", share_pct: "11.2%", workers: 2, expected_blocks: 0.8, actual_blocks: 1 },
-        { miner_id: "miner-e9", hashrate: "4.2 TH/s", share_pct: "8.7%", workers: 1, expected_blocks: 0.6, actual_blocks: 1 },
-        { miner_id: "miner-f4", hashrate: "3.1 TH/s", share_pct: "6.4%", workers: 1, expected_blocks: 0.4, actual_blocks: 1 },
-        { miner_id: "miner-g8", hashrate: "2.4 TH/s", share_pct: "5.0%", workers: 1, expected_blocks: 0.3, actual_blocks: 0 },
-        { miner_id: "miner-h1", hashrate: "1.8 TH/s", share_pct: "3.7%", workers: 1, expected_blocks: 0.3, actual_blocks: 0 },
-        { miner_id: "miner-j6", hashrate: "1.2 TH/s", share_pct: "2.5%", workers: 1, expected_blocks: 0.2, actual_blocks: 0 },
-        { miner_id: "miner-k3", hashrate: "0.9 TH/s", share_pct: "1.9%", workers: 1, expected_blocks: 0.1, actual_blocks: 0 },
-        { miner_id: "miner-m2", hashrate: "0.6 TH/s", share_pct: "1.2%", workers: 1, expected_blocks: 0.1, actual_blocks: 0 },
-        { miner_id: "miner-n8", hashrate: "0.3 TH/s", share_pct: "0.7%", workers: 1, expected_blocks: 0.0, actual_blocks: 0 },
-      ],
-      recent_blocks: [
-        {
-          found_at: new Date(now - 2 * 60 * 60 * 1000).toISOString(),
-          height: 1842,
-          hash: "000000086c4a91e2b7d04f1c8a55e390b2d1c7a04e9f6b83a1c2d4e5f6071829",
-          finder: "miner-a1",
-          shares: 18420,
-          difficulty: "1.21k",
-        },
-        {
-          found_at: new Date(now - 6 * 60 * 60 * 1000).toISOString(),
-          height: 1831,
-          hash: "0000000a91c3e4b18d205f7a6c44d201e9b0c8f15a76e392d4c1b0a9f8e7d6c5",
-          finder: "miner-d2",
-          shares: 16110,
-          difficulty: "1.21k",
-        },
-        {
-          found_at: new Date(now - 11 * 60 * 60 * 1000).toISOString(),
-          height: 1819,
-          hash: "00000004e2b91a70c3d85f14a6b0e291d7c4a8f03e55b162c9d0e1f2a3b4c5d6",
-          finder: "miner-b7",
-          shares: 19840,
-          difficulty: "1.21k",
-        },
-        {
-          found_at: new Date(now - 15 * 60 * 60 * 1000).toISOString(),
-          height: 1804,
-          hash: "00000011b8c0d4e5f6a7182930415263748596a7b8c9d0e1f203142536475869",
-          finder: "miner-c3",
-          shares: 14220,
-          difficulty: "1.19k",
-        },
-        {
-          found_at: new Date(now - 22 * 60 * 60 * 1000).toISOString(),
-          height: 1788,
-          hash: "00000007d1c2b3a49586757463524130291807f6e5d4c3b2a1908071625344",
-          finder: "miner-e9",
-          shares: 17650,
-          difficulty: "1.19k",
-        },
-        {
-          found_at: new Date(now - 29 * 60 * 60 * 1000).toISOString(),
-          height: 1766,
-          hash: "00000002c8d9e0f1a2b30415263748596a7b8c9d0e1f2031425364758697a8b9",
-          finder: "miner-f4",
-          shares: 15330,
-          difficulty: "1.18k",
-        },
-        {
-          found_at: new Date(now - 38 * 60 * 60 * 1000).toISOString(),
-          height: 1741,
-          hash: "00000009a1b2c3d4e5f60718293a4b5c6d7e8f90112233445566778899aabb",
-          finder: "miner-a1",
-          shares: 20110,
-          difficulty: "1.18k",
-        },
-      ],
-      updated_at: new Date(now).toISOString(),
-    };
-  }
-
   function fetchStatus() {
     return fetch(API_BASE + STATUS_PATH, {
       headers: { Accept: "application/json" },
@@ -484,7 +371,7 @@
           applyStatus(root, data);
         })
         .catch(function () {
-          applyStatus(root, localStub());
+          applyStatus(root, null, true);
         });
     }
 

@@ -40,28 +40,29 @@
             <span class="pip pip--stub indicator indicator--stub" aria-hidden="true"></span>
             <span data-field="phase-label">signet testnet</span>
             ·
-            <span data-field="updated">test data · not yet live</span>
+            <span data-field="updated">not live yet</span>
           </p>
           <h1 class="page-title">Status</h1>
+          <p class="status-note" data-field="notice" role="status">The pool is not live yet. Stats will appear here once it is.</p>
         </div>
         <p class="dash-head__line">
-          <span data-field="quorum_status">assembled</span>
+          <span data-field="quorum_status">—</span>
           ·
-          <span data-field="peers_finalized">8</span> peers finalized
+          <span data-field="peers_finalized">—</span> peers finalized
           ·
-          <span data-field="pending_shares">142</span> shares pending
+          <span data-field="pending_shares">—</span> shares pending
         </p>
       </div>
 
       <section class="snap" aria-label="Snapshot">
         <p class="eyebrow">Last finalized snapshot</p>
-        <p class="snap__id" data-field="snapshot_id">7c3e9a1f…e4a072</p>
+        <p class="snap__id" data-field="snapshot_id">—</p>
         <ul class="snap__facts">
           <li><span class="k">network</span> <span data-field="network">signet</span></li>
-          <li><span class="k">derivation</span> <span data-field="derivation_version">1</span></li>
+          <li><span class="k">derivation</span> <span data-field="derivation_version">—</span></li>
           <li><span class="k">fee</span> <span data-field="fee">1%</span></li>
           <li><span class="k">payout</span> <span data-field="payout">coinbase / PPLNS</span></li>
-          <li><span class="k">window</span> <span data-field="pending_shares">142</span> / <span data-field="share_window">10000</span></li>
+          <li><span class="k">window</span> <span data-field="pending_shares">—</span> / <span data-field="share_window">—</span></li>
         </ul>
         <div class="compose" data-compose="shares" role="img" aria-label="Share of work"></div>
       </section>
@@ -76,6 +77,7 @@
           </div>
         </div>
         <div class="chart">
+          <p class="chart-empty" data-chart-empty>No hashrate data yet</p>
           <svg data-chart="hashrate" viewBox="0 0 800 200" preserveAspectRatio="none" role="img" aria-label="Pool hashrate"></svg>
         </div>
         <div class="chart-meta">
